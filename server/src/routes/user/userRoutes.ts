@@ -1,29 +1,68 @@
-import express, { Request, Response } from 'express';
+import express, { Request, RequestHandler, Response } from 'express';
 const router = express.Router();
 
-// GET all users
-router.get('/', (req: Request, res: Response) => {
-    res.json({ message: 'Get all users' });
-});
 
-// GET single user
-router.get('/:id', (req: Request, res: Response) => {
-    res.json({ message: `Get user with id: ${req.params.id}` });
-});
+const getUsers = async (req: Request, res: Response) => {
+    try {
+        const users = ["hey", "there", "how", "are", "you"];
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users' });
+    }
+}
 
-// POST create user
-router.post('/', (req: Request, res: Response) => {
-    res.json({ message: 'Create new user' });
-});
+const getUserById = async (req: Request, res: Response) => {
+    try {
+        const users = [{ id: 1, name: "John" }, { id: 2, name: "Jane" }, { id: 3, name: "Jim" }];
+        const user = users.find((user) => user.id === Number(req.params.id));
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user' });
+    }
+}
 
-// PUT update user
-router.put('/:id', (req: Request, res: Response) => {
-    res.json({ message: `Update user with id: ${req.params.id}` });
-});
+const createUser = async (req: Request, res: Response) => {
+    try {
+        const user = req.body;
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating user' });
+    }
+}
 
-// DELETE user
-router.delete('/:id', (req: Request, res: Response) => {
-    res.json({ message: `Delete user with id: ${req.params.id}` });
-});
+const updateUser: RequestHandler = async (req, res) => {
+    try {
+        const userId = Number(req.params.id);
+        const updatedData = req.body;
+        // Simulate finding and updating a user
+        const users = [{ id: 1, name: "John" }, { id: 2, name: "Jane" }, { id: 3, name: "Jim" }];
+        const user = users.find((user) => user.id === userId);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+        }
+        const updatedUser = { ...user, ...updatedData };
+        res.json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user' });
+    }
+}
 
+const deleteUser: RequestHandler = async (req, res) => {
+    try {
+        const userId = Number(req.params.id);
+        // Simulate finding and deleting a user
+        const users = [{ id: 1, name: "John" }, { id: 2, name: "Jane" }, { id: 3, name: "Jim" }];
+        const user = users.find((user) => user.id === userId);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+        }
+        res.json({ message: `User ${userId} deleted successfully` });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user' });
+    }
+}
+
+
+router.route('/').get(getUsers).post(createUser);
+router.route('/:id').get(getUserById).put(updateUser).delete(deleteUser);
 export default router; 
