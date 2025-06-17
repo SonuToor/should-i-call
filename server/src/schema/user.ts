@@ -11,4 +11,9 @@ export const userSchema = z.object({
 export const createUserSchema = userSchema;
 
 // Schema for user update (all fields optional)
-export const updateUserSchema = userSchema.partial();
+export const updateUserSchema = userSchema.partial().refine(
+    (data) => Object.keys(data).length > 0,
+    {
+        message: "At least one field must be provided for update"
+    }
+);
