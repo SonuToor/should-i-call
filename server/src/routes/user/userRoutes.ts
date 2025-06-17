@@ -1,5 +1,6 @@
 import express, { Request, RequestHandler, Response } from 'express';
 import { createUserSchema, updateUserSchema } from '../../schema/user';
+import { createUser } from '../../supabase/service';
 const router = express.Router();
 
 
@@ -23,22 +24,23 @@ const getUserById = async (req: Request, res: Response) => {
     }
 }
 
-const createUser: RequestHandler = async (req, res) => {
+const createUserHandler: RequestHandler = async (req, res) => {
+    const result = createUserSchema.safeParse(req.body);
+
+    if (!result.success) {
+        res.status(400).json({
+            message: 'Validation error',
+            errors: result.error.errors
+        });
+        return;
+    }
     try {
-        const result = createUserSchema.safeParse(req.body);
-
-        if (!result.success) {
-            res.status(400).json({
-                message: 'Validation error',
-                errors: result.error.errors
-            });
-            return;
-        }
-
-        const newUser = result.data;
+        const newUser = await createUser(result.data);
         res.status(201).json(newUser);
+        return
     } catch (error) {
-        res.status(500).json({ message: 'Error creating user' });
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+        res.status(400).json({ message: `Error creating user: ${errorMessage}` });
     }
 }
 
@@ -85,6 +87,6 @@ const deleteUser: RequestHandler = async (req, res) => {
 }
 
 
-router.route('/').get(getUsers).post(createUser);
+router.route('/').get(getUsers).post(createUserHandler);
 router.route('/:id').get(getUserById).put(updateUser).delete(deleteUser);
 export default router; 
