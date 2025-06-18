@@ -6,6 +6,6 @@ const router = express.Router();
 
 // Mount sub-routes
 router.use('/user', userRoutes);
-router.use('/contact', contactRoutes);
+router.use('/user/:userId/contact', contactRoutes);
 
 export default router; 

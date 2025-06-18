@@ -14,8 +14,6 @@ export const ContactFrequency = z.enum([
 
 // Define the contact schema
 export const contactSchema = z.object({
-    id: z.string().uuid(),
-    createdAt: z.date(),
     name: z.string().min(1, 'Name is required'),
     contactFrequency: ContactFrequency,
     lastContacted: z.date().nullable(),
@@ -23,11 +21,7 @@ export const contactSchema = z.object({
 });
 
 // Schema for contact creation (all fields required except id, createdAt, and lastContacted)
-export const createContactSchema = contactSchema.omit({
-    id: true,
-    createdAt: true,
-    lastContacted: true
-});
+export const createContactSchema = contactSchema
 
 // Schema for contact update (all fields optional)
 export const updateContactSchema = contactSchema.partial(); 
