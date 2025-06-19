@@ -16,7 +16,7 @@ export const ContactFrequency = z.enum([
 export const contactSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     contactFrequency: ContactFrequency,
-    lastContacted: z.date().nullable(),
+    lastContacted: z.date().optional(),
     userId: z.string().uuid()
 });
 
