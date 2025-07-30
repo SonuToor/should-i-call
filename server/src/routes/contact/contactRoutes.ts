@@ -1,14 +1,18 @@
 import express, { Request, Response, RequestHandler } from 'express';
-import { createContactSchema, updateContactSchema } from '../../schema/contact';
+import { createContactSchema, RawContact, updateContactSchema } from '../../schema/contact';
 import { createContact, getContacts, getContactById, updateContact, deleteContact } from '../../supabase/service';
+import { getLiftedContact } from '../../utils/whenToCall';
+
+
 const router = express.Router({ mergeParams: true });
 
-// All handlers now expect req.params.userId
 const getContactsHandler: RequestHandler = async (req, res) => {
     try {
         const userId = req.params.userId;
-        const contacts = await getContacts(userId);
-        res.status(200).json(contacts);
+        const contacts = await getContacts(userId) as RawContact[];
+
+        const liftedContacts = contacts.map((contact) => getLiftedContact(contact)).sort((a, b) => a.daysUntilNextCall - b.daysUntilNextCall);
+        res.status(200).json(liftedContacts);
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         res.status(400).json({ message: `Error fetching contacts: ${errorMessage}` });

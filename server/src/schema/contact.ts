@@ -24,4 +24,14 @@ export const contactSchema = z.object({
 export const createContactSchema = contactSchema
 
 // Schema for contact update (all fields optional)
-export const updateContactSchema = contactSchema.partial(); 
+export const updateContactSchema = contactSchema.partial();
+
+export type RawContact = z.infer<typeof contactSchema> & {
+    id: string;
+    createdAt: Date;
+}
+
+export type Contact = RawContact & {
+    nextContact: Date;
+    daysUntilNextCall: number;
+};
